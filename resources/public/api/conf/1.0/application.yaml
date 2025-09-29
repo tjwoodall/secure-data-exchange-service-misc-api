@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  title: Secure Data Exchange Service - File Upload API
+  version: "1.0"
+  description: |
+    ## Overview
+    An API for creating URLs that can be used to upload one or more files and associated metadata to the Secure Data Exchange Service (SDES). The API is designed for use with Web Forms.
+    <br><br>
+    Please note that SRN and Information Type are only required in production. Please, reach out to an HMRC representative to obtain these.
+    <br><br>
+    For users of the API for the Windsor Framework Post and Parcels service there is a service guide available:
+    <br><br>
+    https://developer.service.hmrc.gov.uk/guides/post-and-parcels-service-guide/#using-the-secure-data-exchange-service-sdes
+    <br><br>
+
+servers:
+  - url: https://test-api.service.hmrc.gov.uk/
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk/
+    description: Production
+paths:
+  /misc/sdes-file-upload/files/upload/url/{srn}/{informationType}:
+    post:
+      summary: Create upload URL(s)
+      description: |
+        Creates one or more URLs, each of which comes with a TTL (time-to-live) and can be used to upload a file.
+      parameters:
+        - $ref: '#/components/parameters/path_srn'
+        - $ref: '#/components/parameters/path_informationType'
+        - $ref: '#/components/parameters/header_Accept'
+        - $ref: '#/components/parameters/header_Content-Type'
+        - $ref: '#/components/parameters/header_Authorization'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Files'
+            example:
+              $ref: '#/components/examples/json_request/value'
+        required: true
+      responses:
+        "201":
+          description: URL(s) created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileURLs'
+              example:
+                $ref: '#/components/examples/json_response/value'
+        "400":
+          description: 'Invalid request'
+        "403":
+          description: 'Access Denied: Invalid credentials'
+      security:
+        - applicationRestricted: []
+components:
+  schemas:
+    Files:
+      type: array
+      items:
+        $ref: '#/components/schemas/File'
+    File:
+      required:
+        - filename
+      properties:
+        filename:
+          type: string
+          example: myfile.txt
+          description: The name of file that will be uploaded
+        metadata:
+          type: array
+          description: Optional key-value pairs of metadata that will be associated with each file. You will be notified by your HMRC contact if you need to send any metadata.
+          items:
+            $ref: '#/components/schemas/Metadata'
+      type: object
+    Metadata:
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          example: reference
+        value:
+          type: string
+          example: B1234
+      type: object
+    FileURLs:
+      type: array
+      items:
+        $ref: '#/components/schemas/FileURL'
+    FileURL:
+      required:
+        - file
+        - url
+      properties:
+        file:
+          type: string
+          example: myfile.txt
+        url:
+          type: string
+          format: url
+          description: |
+            The URL generated to upload the corresponding file.  Authorisation is not required when uploading a file to SDES.
+            <br><br>
+            The URL supports the POST method ONLY.
+            <br><br>
+            The POST request MUST also include the header 'Content-Type: multipart/form-data'.
+            <br><br>
+            The URL generated is valid for up to 30 minutes, after which if not used, the HTTP response code 410 (EXPIRED) is generated."
+          example: 'https://www.hmrc-domain.com/6078e65d-0a4f-4ef9-8c88-ef4bb860419d'
+      type: object
+    srn:
+      type: string
+      pattern: ^\d{12}$
+      example: "012345678901"
+    informationType:
+      type: string
+      example: "informationType901"
+  parameters:
+    path_srn:
+      name: srn
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/srn'
+      description: "Your organisation's unique SDES Reference Number (SRN). If you don't already have an SRN, it will be sent to you as part of registering to use the Secure Data Exchange Service (NB: this is separate to subscribing to this API)."
+    path_informationType:
+      name: informationType
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/informationType'
+      description: "The value indicates the HMRC recipient of the files to be uploaded. This will be sent to you as part of registering to use the Secure Data Exchange Service (NB: this is separate to subscribing to this API)."
+    header_Accept:
+      name: Accept
+      in: header
+      required: true
+      description: Specifies the response format and the [version](/api-documentation/docs/reference-guide#versioning) of the API to be used.
+      schema:
+        type: string
+        example: application/vnd.hmrc.1.0+json
+    header_Content-Type:
+      name: Content-Type
+      in: header
+      required: true
+      description: Specifies the format of the request body, which must be either XML or JSON. UTF-8 is the only valid character set.
+      schema:
+        type: string
+        example: application/json; charset=UTF-8
+    header_Authorization:
+      name: Authorization
+      in: header
+      required: true
+      description: An [OAuth 2.0 Bearer Token](http://localhost:9680/api-documentation/docs/authorisation/application-restricted-endpoints).
+      schema:
+        type: string
+        example: Bearer 59fc92c1cdf0b8ef1f138a702effdbd2
+  examples:
+    json_request:
+      value:
+        - filename: myfile.txt
+          metadata:
+            - key: metadata-key-1
+              value: metadata-key-1-value
+            - key: metadata-key-2
+              value: metadata-key-2-value
+        - filename: testFile.txt
+
+    json_response:
+      value:
+        - file: myfile.txt
+          url: 'https://www.hmrc-domain.com/6078e65d-0a4f-4ef9-8c88-ef4bb860419d'
+        - file: testFile.txt
+          url: 'https://www.hmrc-domain.com/6078e65d-0a4f-4ef9-8c88-e60419df4bb8'
+  securitySchemes:
+    applicationRestricted:
+      type: oauth2
+      description: |
+        HMRC supports OAuth 2.0 for authenticating application restricted API requests using an OAuth 2.0 Bearer Token in the AUTHORIZATION header.
+        See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/application-restricted-endpoints for details.
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          scopes: {}
