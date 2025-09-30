@@ -99,7 +99,7 @@ components:
           example: myfile.txt
         url:
           type: string
-          format: url
+          format: uri
           description: |
             The URL generated to upload the corresponding file.  Authorisation is not required when uploading a file to SDES.
             <br><br>
