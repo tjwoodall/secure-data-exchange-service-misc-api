@@ -14,9 +14,9 @@ info:
     <br><br>
 
 servers:
-  - url: https://test-api.service.hmrc.gov.uk/
+  - url: https://test-api.service.hmrc.gov.uk
     description: Sandbox
-  - url: https://api.service.hmrc.gov.uk/
+  - url: https://api.service.hmrc.gov.uk
     description: Production
 paths:
   /misc/sdes-file-upload/files/upload/url/{srn}/{informationType}:
