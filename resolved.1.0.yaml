@@ -18,11 +18,12 @@ servers:
 - url: https://api.service.hmrc.gov.uk/
   description: Production
 paths:
-  /misc/sdes-file-upload/files/upload/url/{srn}/{informationType}:
+  /misc/sdes-file-upload/files/upload/url/{srn}:
     post:
       summary: Create upload URL(s)
       description: |
-        Creates one or more URLs, each of which comes with a TTL (time-to-live) and can be used to upload a file.
+        Creates one or more URLs, each of which comes with a TTL (time-to-live) and can be used to upload a file. The provided
+        SRN and filename will be used to identify the HMRC recipient of the files to be uploaded.
       parameters:
       - name: srn
         in: path
@@ -34,7 +35,125 @@ paths:
         style: simple
         explode: false
         schema:
-          pattern: "^\\d{12}$"
+          type: string
+          example: "012345678901"
+      - name: Accept
+        in: header
+        description: "Specifies the response format and the [version](/api-documentation/docs/reference-guide#versioning)\
+          \ of the API to be used."
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: application/vnd.hmrc.1.0+json
+      - name: Content-Type
+        in: header
+        description: "Specifies the format of the request body, which must be either\
+          \ XML or JSON. UTF-8 is the only valid character set."
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: application/json; charset=UTF-8
+      - name: Authorization
+        in: header
+        description: "An [OAuth 2.0 Bearer Token](http://localhost:9680/api-documentation/docs/authorisation/application-restricted-endpoints)."
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: Bearer 59fc92c1cdf0b8ef1f138a702effdbd2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                required:
+                - filename
+                type: object
+                properties:
+                  filename:
+                    type: string
+                    description: The name of file that will be uploaded
+                    example: myfile.txt
+                  metadata:
+                    type: array
+                    description: Optional key-value pairs of metadata that will be
+                      associated with each file. You will be notified by your HMRC
+                      contact if you need to send any metadata.
+                    items:
+                      required:
+                      - key
+                      - value
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                          example: reference
+                        value:
+                          type: string
+                          example: B1234
+            example:
+              $ref: '#/components/examples/json_request/value'
+        required: true
+      responses:
+        "201":
+          description: URL(s) created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  required:
+                  - file
+                  - url
+                  type: object
+                  properties:
+                    file:
+                      type: string
+                      example: myfile.txt
+                    url:
+                      type: string
+                      description: |
+                        The URL generated to upload the corresponding file.  Authorisation is not required when uploading a file to SDES.
+                        <br><br>
+                        The URL supports the POST method ONLY.
+                        <br><br>
+                        The POST request MUST also include the header 'Content-Type: multipart/form-data'.
+                        <br><br>
+                        The URL generated is valid for up to 30 minutes, after which if not used, the HTTP response code 410 (EXPIRED) is generated."
+                      format: url
+                      example: https://www.hmrc-domain.com/6078e65d-0a4f-4ef9-8c88-ef4bb860419d
+              example:
+                $ref: '#/components/examples/json_response/value'
+        "400":
+          description: Invalid request
+        "403":
+          description: "Access Denied: Invalid credentials"
+      security:
+      - applicationRestricted: []
+  /misc/sdes-file-upload/files/upload/url/{srn}/{informationType}:
+    post:
+      summary: Create classic upload URL(s)
+      description: |
+        Creates one or more URLs, each of which comes with a TTL (time-to-live) and can be used to upload a file. This variant
+        requires both an SRN and an Information Type to be provided. The Information Type is used to identify the HMRC recipient
+        of the files to be uploaded. Your HMRC contact will let you know if you need to use an Information Type.
+      parameters:
+      - name: srn
+        in: path
+        description: "Your organisation's unique SDES Reference Number (SRN). If you\
+          \ don't already have an SRN, it will be sent to you as part of registering\
+          \ to use the Secure Data Exchange Service (NB: this is separate to subscribing\
+          \ to this API)."
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
           example: "012345678901"
       - name: informationType
@@ -260,7 +379,6 @@ components:
           format: url
           example: https://www.hmrc-domain.com/6078e65d-0a4f-4ef9-8c88-ef4bb860419d
     srn:
-      pattern: "^\\d{12}$"
       type: string
       example: "012345678901"
     informationType:
@@ -278,7 +396,6 @@ components:
       style: simple
       explode: false
       schema:
-        pattern: "^\\d{12}$"
         type: string
         example: "012345678901"
     path_informationType:
