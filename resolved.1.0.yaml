@@ -3,14 +3,9 @@ info:
   title: Secure Data Exchange Service - File Upload API
   description: |
     ## Overview
-    An API for creating URLs that can be used to upload one or more files and associated metadata to the Secure Data Exchange Service (SDES). The API is designed for use with Web Forms.
+    Create URLs to transfer one or more files to HMRC. Designed for use with Web Forms. (Formerly the Secure Data Exchange Service (SDES) File Upload API).
     <br><br>
-    Please note that SRN and Information Type are only required in production. Please, reach out to an HMRC representative to obtain these.
-    <br><br>
-    For users of the API for the Windsor Framework Post and Parcels service there is a service guide available:
-    <br><br>
-    https://developer.service.hmrc.gov.uk/guides/post-and-parcels-service-guide/#using-the-secure-data-exchange-service-sdes
-    <br><br>
+    In production, you must supply a Service Reference Number (SRN) - or, for legacy transfers, both an SRN and an information type. These are obtained by registering for HMRC’s file transfer service. Contact your HMRC representative for more information.
   version: "1.0"
 servers:
 - url: https://test-api.service.hmrc.gov.uk/
@@ -27,8 +22,8 @@ paths:
       parameters:
       - name: srn
         in: path
-        description: "Your organisation's unique SDES Reference Number (SRN). If you\
-          \ don't already have an SRN, it will be sent to you as part of registering\
+        description: "Your organisation's unique Service Reference Number (SRN). If\
+          \ you don't already have an SRN, it will be sent to you as part of registering\
           \ to use the Secure Data Exchange Service (NB: this is separate to subscribing\
           \ to this API)."
         required: true
@@ -98,7 +93,7 @@ paths:
                           type: string
                           example: B1234
             example:
-              $ref: '#/components/examples/json_request/value'
+              $ref: "#/components/examples/json_request/value"
         required: true
       responses:
         "201":
@@ -119,7 +114,7 @@ paths:
                     url:
                       type: string
                       description: |
-                        The URL generated to upload the corresponding file.  Authorisation is not required when uploading a file to SDES.
+                        The URL generated to upload the corresponding file. Authorisation is not required when uploading a file.
                         <br><br>
                         The URL supports the POST method ONLY.
                         <br><br>
@@ -129,7 +124,7 @@ paths:
                       format: url
                       example: https://www.hmrc-domain.com/6078e65d-0a4f-4ef9-8c88-ef4bb860419d
               example:
-                $ref: '#/components/examples/json_response/value'
+                $ref: "#/components/examples/json_response/value"
         "400":
           description: Invalid request
         "403":
@@ -146,8 +141,8 @@ paths:
       parameters:
       - name: srn
         in: path
-        description: "Your organisation's unique SDES Reference Number (SRN). If you\
-          \ don't already have an SRN, it will be sent to you as part of registering\
+        description: "Your organisation's unique Service Reference Number (SRN). If\
+          \ you don't already have an SRN, it will be sent to you as part of registering\
           \ to use the Secure Data Exchange Service (NB: this is separate to subscribing\
           \ to this API)."
         required: true
@@ -228,7 +223,7 @@ paths:
                           type: string
                           example: B1234
             example:
-              $ref: '#/components/examples/json_request/value'
+              $ref: "#/components/examples/json_request/value"
         required: true
       responses:
         "201":
@@ -249,7 +244,7 @@ paths:
                     url:
                       type: string
                       description: |
-                        The URL generated to upload the corresponding file.  Authorisation is not required when uploading a file to SDES.
+                        The URL generated to upload the corresponding file. Authorisation is not required when uploading a file.
                         <br><br>
                         The URL supports the POST method ONLY.
                         <br><br>
@@ -259,7 +254,7 @@ paths:
                       format: url
                       example: https://www.hmrc-domain.com/6078e65d-0a4f-4ef9-8c88-ef4bb860419d
               example:
-                $ref: '#/components/examples/json_response/value'
+                $ref: "#/components/examples/json_response/value"
         "400":
           description: Invalid request
         "403":
@@ -348,7 +343,7 @@ components:
           url:
             type: string
             description: |
-              The URL generated to upload the corresponding file.  Authorisation is not required when uploading a file to SDES.
+              The URL generated to upload the corresponding file. Authorisation is not required when uploading a file.
               <br><br>
               The URL supports the POST method ONLY.
               <br><br>
@@ -369,7 +364,7 @@ components:
         url:
           type: string
           description: |
-            The URL generated to upload the corresponding file.  Authorisation is not required when uploading a file to SDES.
+            The URL generated to upload the corresponding file. Authorisation is not required when uploading a file.
             <br><br>
             The URL supports the POST method ONLY.
             <br><br>
@@ -388,8 +383,8 @@ components:
     path_srn:
       name: srn
       in: path
-      description: "Your organisation's unique SDES Reference Number (SRN). If you\
-        \ don't already have an SRN, it will be sent to you as part of registering\
+      description: "Your organisation's unique Service Reference Number (SRN). If\
+        \ you don't already have an SRN, it will be sent to you as part of registering\
         \ to use the Secure Data Exchange Service (NB: this is separate to subscribing\
         \ to this API)."
       required: true
